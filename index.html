@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.6">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Helvetica Neue'; color: #161616; -webkit-text-stroke: #161616}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Helvetica Neue'; color: #161616; -webkit-text-stroke: #161616; min-height: 16.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;html&gt;</span></p>
+<p class="p1"><span class="s1">&lt;head&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;title&gt;Carte antennes sans clusters&lt;/title&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta charset="utf-8" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" /&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"&gt;&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;style&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>#map { height: 600px; width: 100%; }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>#controls {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>position: absolute;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>top: 10px; right: 10px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>background: white;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>padding: 10px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>z-index: 1000;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>border-radius: 5px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>box-shadow: 0 0 6px rgba(0,0,0,0.3);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-family: Arial, sans-serif;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>font-size: 14px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>user-select: none;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>.freq-label, .operator-label {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>cursor: pointer;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>display: block;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>margin-bottom: 6px;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div id="controls"&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;fieldset&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;legend&gt;&lt;b&gt;Opérateur :&lt;/b&gt;&lt;/legend&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;label class="operator-label"&gt;&lt;input type="radio" name="operatorFilter" value="Sunrise" checked&gt; Sunrise&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;label class="operator-label"&gt;&lt;input type="radio" name="operatorFilter" value="Salt"&gt; Salt&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;label class="operator-label"&gt;&lt;input type="radio" name="operatorFilter" value="Swisscom"&gt; Swisscom&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/fieldset&gt;</span></p>
+<p class="p2"><span class="s1"><span class="Apple-converted-space">    </span></span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;fieldset&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;legend&gt;&lt;b&gt;Fréquence :&lt;/b&gt;&lt;/legend&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;label class="freq-label"&gt;&lt;input type="radio" name="freqFilter" value="freq1" checked&gt; &amp;lt; 900 MHz&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;label class="freq-label"&gt;&lt;input type="radio" name="freqFilter" value="freq2"&gt; 900-1000 MHz&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;label class="freq-label"&gt;&lt;input type="radio" name="freqFilter" value="freq3"&gt; 1000-3000 MHz&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;label class="freq-label"&gt;&lt;input type="radio" name="freqFilter" value="freq4"&gt; &amp;gt; 3000 MHz&lt;/label&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/fieldset&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div id="map"&gt;&lt;/div&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;script&gt;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>var map = L.map('map').setView([46.8, 8.2], 8);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>attribution: '© OpenStreetMap contributors'</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}).addTo(map);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// URLs des fichiers GeoJSON</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>var geojsonURLs = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>Sunrise: 'https://raw.githubusercontent.com/AntenneCarte/antenne5g/main/Sunrise-5G.geojson',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>Salt: 'https://raw.githubusercontent.com/AntenneCarte/antenne5g/main/Salt-5G.geojson',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>Swisscom: 'https://raw.githubusercontent.com/AntenneCarte/antenne5g/main/Swisscom-5G.geojson'</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>var layers = {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>freq1: { markers: L.layerGroup(), sectors: L.layerGroup() },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>freq2: { markers: L.layerGroup(), sectors: L.layerGroup() },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>freq3: { markers: L.layerGroup(), sectors: L.layerGroup() },</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>freq4: { markers: L.layerGroup(), sectors: L.layerGroup() }</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>};</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>var currentOperator = "Sunrise";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>var currentFrequency = "freq1";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>var sectorRadius = 500 / 3; // ~167m</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function createAzimuthSector(lat, lon, azimuth, angleWidth, radius) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>var points = [];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>var numPoints = 30;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>points.push([lat, lon]);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>var azimuthRad = azimuth * Math.PI / 180;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>var angleStart = azimuthRad - (angleWidth * Math.PI / 180) / 2;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>var angleEnd = azimuthRad + (angleWidth * Math.PI / 180) / 2;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>for (var i = 0; i &lt;= numPoints; i++) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>var angle = angleStart + (angleEnd - angleStart) * (i / numPoints);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>var dx = radius * Math.sin(angle);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>var dy = radius * Math.cos(angle);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>var newLat = lat + (dy / 111320);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>var newLon = lon + (dx / (111320 * Math.cos(lat * Math.PI / 180)));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>points.push([newLat, newLon]);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>return points;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>function updateMap() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>for (const key in layers) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>map.removeLayer(layers[key].markers);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>map.removeLayer(layers[key].sectors);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>layers[key].markers.clearLayers();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>layers[key].sectors.clearLayers();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>fetch(geojsonURLs[currentOperator])</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.then(response =&gt; response.json())</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.then(data =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>data.features.forEach(feature =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (feature.geometry.type === "Point") {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var coords = feature.geometry.coordinates;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var lon = coords[0];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var lat = coords[1];</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var props = feature.properties;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var azimutStr = props["Azimut"] || "0°";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var azimut = parseFloat(azimutStr.replace("°", ""));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var freqStr = props["frequency (MHz)"] || "0 MHz";</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var freq = parseFloat(freqStr.replace(/[^\d.]/g, ''));</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var marker = L.circleMarker([lat, lon], {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>radius: 5,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>color: 'red',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>fillColor: 'red',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>fillOpacity: 0.8</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var popupContent =</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>`&lt;b&gt;Fréquence :&lt;/b&gt; ${freqStr}&lt;br&gt;` +</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>`&lt;b&gt;Azimut :&lt;/b&gt; ${azimut}°`;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>marker.bindPopup(popupContent);</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var sectorPoints = createAzimuthSector(lat, lon, azimut, 60, sectorRadius);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>var sector = L.polygon(sectorPoints, {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>color: 'blue',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>fillColor: 'blue',</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>fillOpacity: 0.3,</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>weight: 1</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>if (freq &lt; 900 &amp;&amp; currentFrequency === "freq1") {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>layers.freq1.markers.addLayer(marker);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>layers.freq1.sectors.addLayer(sector);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>} else if (freq &gt;= 900 &amp;&amp; freq &lt;= 1000 &amp;&amp; currentFrequency === "freq2") {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>layers.freq2.markers.addLayer(marker);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>layers.freq2.sectors.addLayer(sector);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>} else if (freq &gt; 1000 &amp;&amp; freq &lt;= 3000 &amp;&amp; currentFrequency === "freq3") {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>layers.freq3.markers.addLayer(marker);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>layers.freq3.sectors.addLayer(sector);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>} else if (freq &gt; 3000 &amp;&amp; currentFrequency === "freq4") {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>layers.freq4.markers.addLayer(marker);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>layers.freq4.sectors.addLayer(sector);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>map.addLayer(layers[currentFrequency].markers);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>map.addLayer(layers[currentFrequency].sectors);</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>})</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>.catch(err =&gt; console.error("Erreur chargement GeoJSON:", err));</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.querySelectorAll('input[name="operatorFilter"]').forEach(radio =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>radio.addEventListener('change', function() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (this.checked) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>currentOperator = this.value;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>updateMap();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.querySelectorAll('input[name="freqFilter"]').forEach(radio =&gt; {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>radio.addEventListener('change', function() {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>if (this.checked) {</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>currentFrequency = this.value;</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>updateMap();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>});</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>updateMap();</span></p>
+<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+</body>
+</html>
