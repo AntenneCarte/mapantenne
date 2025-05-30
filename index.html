@@ -42,7 +42,7 @@
       <label class="operator-label"><input type="radio" name="operatorFilter" value="Salt"> Salt</label>
       <label class="operator-label"><input type="radio" name="operatorFilter" value="Swisscom"> Swisscom</label>
     </fieldset>
-    
+
     <fieldset>
       <legend><b>Fréquence :</b></legend>
       <label class="freq-label"><input type="radio" name="freqFilter" value="freq1" checked> < 900 MHz</label>
@@ -101,7 +101,6 @@
     }
 
     function updateMap() {
-      // Clear all layers
       for (const key in layers) {
         map.removeLayer(layers[key].markers);
         map.removeLayer(layers[key].sectors);
@@ -109,7 +108,6 @@
         layers[key].sectors.clearLayers();
       }
 
-      // Store markers by coordinates to avoid duplicates
       var markerCoords = {};
 
       fetch(geojsonURLs[currentOperator])
@@ -128,7 +126,6 @@
               var freq = parseFloat(freqStr.replace(/[^\d.]/g, '')) || 0;
               var powerStr = props["Power (W)"] || "N/A";
 
-              // Determine which frequency layer this feature belongs to
               var targetLayer;
               if (freq < 900) {
                 targetLayer = "freq1";
@@ -140,12 +137,8 @@
                 targetLayer = "freq4";
               }
 
-              // Only process if the feature matches the current frequency filter
               if (targetLayer === currentFrequency) {
-                // Create a unique key for coordinates
                 var coordKey = `${lat.toFixed(6)},${lon.toFixed(6)}`;
-
-                // Create marker only if it doesn't exist for these coordinates
                 if (!markerCoords[coordKey]) {
                   var marker = L.circleMarker([lat, lon], {
                     radius: 5,
@@ -157,7 +150,6 @@
                   layers[currentFrequency].markers.addLayer(marker);
                 }
 
-                // Create sector
                 var sectorPoints = createAzimuthSector(lat, lon, azimut, 60, sectorRadius);
                 var sector = L.polygon(sectorPoints, {
                   color: 'blue',
@@ -166,20 +158,17 @@
                   weight: 1
                 });
 
-                // Bind popup to sector with "W" added to power
                 var popupContent =
                   `<b>Fréquence :</b> ${freqStr}<br>` +
                   `<b>Puissance :</b> ${powerStr !== "N/A" ? powerStr + " W" : powerStr}<br>` +
                   `<b>Azimut :</b> ${azimut}°`;
                 sector.bindPopup(popupContent);
 
-                // Add sector to the appropriate layer
                 layers[currentFrequency].sectors.addLayer(sector);
               }
             }
           });
 
-          // Add the current frequency layers to the map
           map.addLayer(layers[currentFrequency].markers);
           map.addLayer(layers[currentFrequency].sectors);
         })
