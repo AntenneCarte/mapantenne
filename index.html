@@ -58,10 +58,10 @@
 
     <fieldset>
       <legend><b>Fréquence :</b></legend>
-      <label class="freq-label"><input type="radio" name="freqFilter" value="freq1" checked> < 900 MHz</label>
-      <label class="freq-label"><input type="radio" name="freqFilter" value="freq2"> 900-1000 MHz</label>
-      <label class="freq-label"><input type="radio" name="freqFilter" value="freq3"> 1000-3000 MHz</label>
-      <label class="freq-label"><input type="radio" name="freqFilter" value="freq4"> > 3000 MHz</label>
+      <label class="freq-label"><input type="radio" name="freqFilter" value="freq1" checked> 750 MHz</label>
+      <label class="freq-label"><input type="radio" name="freqFilter" value="freq2"> 950 MHz</label>
+      <label class="freq-label"><input type="radio" name="freqFilter" value="freq3"> 2100 MHz</label>
+      <label class="freq-label"><input type="radio" name="freqFilter" value="freq4"> 3500 MHz</label>
     </fieldset>
   </div>
 
@@ -182,7 +182,7 @@
                     });
 
                     var popupContent =
-                      `<b>Fréquence :</b> ${freqStr}<br>` +
+                      `<b>Fréquence simplifiée :</b> ${targetLayer === 'freq1' ? '750 MHz' : targetLayer === 'freq2' ? '950 MHz' : targetLayer === 'freq3' ? '2100 MHz' : '3500 MHz'}<br>` +
                       `<b>Puissance :</b> ${powerStr !== "N/A" ? powerStr + " W" : powerStr}<br>` +
                       `<b>Azimut :</b> ${azimut}°`;
                     sector.bindPopup(popupContent);
