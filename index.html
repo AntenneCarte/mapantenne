@@ -182,7 +182,7 @@
                     });
 
                     var popupContent =
-                      `<b>Fréquence simplifiée :</b> ${targetLayer === 'freq1' ? '750 MHz' : targetLayer === 'freq2' ? '950 MHz' : targetLayer === 'freq3' ? '2100 MHz' : '3500 MHz'}<br>` +
+                      `<b>Fréquence précise :</b> ${freqStr}<br>` +
                       `<b>Puissance :</b> ${powerStr !== "N/A" ? powerStr + " W" : powerStr}<br>` +
                       `<b>Azimut :</b> ${azimut}°`;
                     sector.bindPopup(popupContent);
