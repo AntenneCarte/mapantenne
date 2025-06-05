@@ -19,50 +19,41 @@
       top: 10px;
       right: 10px;
       background: white;
-      padding: 6px;
+      padding: 10px;
       z-index: 1000;
       border-radius: 4px;
       box-shadow: 0 0 4px rgba(0,0,0,0.2);
       font-family: Arial, sans-serif;
       font-size: 12px;
       user-select: none;
-      max-width: 160px;
-    }
-    .freq-label, .operator-label {
-      cursor: pointer;
-      display: block;
-      margin-bottom: 3px;
-    }
-    fieldset {
-      margin-bottom: 6px;
-      border: none;
-      padding: 0;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
-    legend {
-      font-weight: bold;
-      margin-bottom: 4px;
+    .horizontal-group {
+      display: flex;
+      gap: 15px;
+    }
+    label {
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
   <div id="controls">
-    <fieldset>
-      <legend><b>Opérateur :</b></legend>
-      <label class="operator-label"><input type="radio" name="operatorFilter" value="Sunrise" checked> Sunrise</label>
-      <label class="operator-label"><input type="radio" name="operatorFilter" value="Salt"> Salt</label>
-      <label class="operator-label"><input type="radio" name="operatorFilter" value="Swisscom"> Swisscom</label>
-    </fieldset>
-
-    <fieldset>
-      <legend><b>Fréquence :</b></legend>
-      <label class="freq-label"><input type="radio" name="freqFilter" value="freq1" checked> 750 MHz</label>
-      <label class="freq-label"><input type="radio" name="freqFilter" value="freq2"> 950 MHz</label>
-      <label class="freq-label"><input type="radio" name="freqFilter" value="freq3"> 2100 MHz</label>
-      <label class="freq-label"><input type="radio" name="freqFilter" value="freq4"> 3500 MHz</label>
-    </fieldset>
+    <div class="horizontal-group">
+      <label><input type="radio" name="operatorFilter" value="Sunrise" checked> Sunrise</label>
+      <label><input type="radio" name="operatorFilter" value="Salt"> Salt</label>
+      <label><input type="radio" name="operatorFilter" value="Swisscom"> Swisscom</label>
+    </div>
+    <div class="horizontal-group">
+      <label><input type="radio" name="freqFilter" value="freq1" checked> 750 MHz</label>
+      <label><input type="radio" name="freqFilter" value="freq2"> 950 MHz</label>
+      <label><input type="radio" name="freqFilter" value="freq3"> 2100 MHz</label>
+      <label><input type="radio" name="freqFilter" value="freq4"> 3500 MHz</label>
+    </div>
   </div>
 
   <div id="map"></div>
@@ -90,8 +81,8 @@
     var currentOperator = "Sunrise";
     var currentFrequency = "freq1";
     var sectorRadius = 500 / 3;
-    const MIN_ZOOM_FOR_SECTORS = 10; // Seuil de zoom minimum pour les secteurs
-    const MAX_DISTANCE_FOR_SECTORS = 5000; // Distance max en mètres pour afficher les secteurs
+    const MIN_ZOOM_FOR_SECTORS = 10;
+    const MAX_DISTANCE_FOR_SECTORS = 5000;
 
     function createAzimuthSector(lat, lon, azimuth, angleWidth, radius) {
       var points = [];
@@ -124,7 +115,7 @@
       }
 
       var markerCoords = {};
-      var mapCenter = map.getCenter(); // Centre actuel de la carte
+      var mapCenter = map.getCenter();
 
       fetch(geojsonURLs[currentOperator])
         .then(response => response.json())
@@ -154,7 +145,6 @@
               }
 
               if (targetLayer === currentFrequency) {
-                // Toujours ajouter les marqueurs, indépendamment du zoom
                 var coordKey = `${lat.toFixed(6)},${lon.toFixed(6)}`;
                 if (!markerCoords[coordKey]) {
                   var marker = L.circleMarker([lat, lon], {
@@ -167,10 +157,9 @@
                   layers[currentFrequency].markers.addLayer(marker);
                 }
 
-                // Ajouter les secteurs uniquement si zoom >= MIN_ZOOM_FOR_SECTORS et distance <= MAX_DISTANCE_FOR_SECTORS
                 if (map.getZoom() >= MIN_ZOOM_FOR_SECTORS) {
                   var antennaPos = L.latLng(lat, lon);
-                  var distance = mapCenter.distanceTo(antennaPos); // Distance en mètres
+                  var distance = mapCenter.distanceTo(antennaPos);
 
                   if (distance <= MAX_DISTANCE_FOR_SECTORS) {
                     var sectorPoints = createAzimuthSector(lat, lon, azimut, 60, sectorRadius);
@@ -218,7 +207,6 @@
       });
     });
 
-    // Mettre à jour la carte lors d'un changement de zoom ou de déplacement
     map.on('zoomend moveend', function () {
       updateMap();
     });
