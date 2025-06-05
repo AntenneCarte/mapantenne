@@ -22,33 +22,34 @@
       padding: 10px;
       z-index: 1000;
       border-radius: 4px;
-      box-shadow: 0 0 4px rgba(0,0,0,0.2);
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
       font-family: Arial, sans-serif;
       font-size: 12px;
       user-select: none;
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: 10px;
     }
-    .horizontal-group {
+    #operator-group, #freq-group {
       display: flex;
-      gap: 15px;
+      justify-content: space-between;
+      gap: 10px;
     }
     label {
       cursor: pointer;
+      display: block;
     }
   </style>
 </head>
 <body>
 
   <div id="controls">
-    <div class="horizontal-group">
+    <div id="operator-group">
       <label><input type="radio" name="operatorFilter" value="Sunrise" checked> Sunrise</label>
       <label><input type="radio" name="operatorFilter" value="Salt"> Salt</label>
       <label><input type="radio" name="operatorFilter" value="Swisscom"> Swisscom</label>
     </div>
-    <div class="horizontal-group">
+    <div id="freq-group">
       <label><input type="radio" name="freqFilter" value="freq1" checked> 750 MHz</label>
       <label><input type="radio" name="freqFilter" value="freq2"> 950 MHz</label>
       <label><input type="radio" name="freqFilter" value="freq3"> 2100 MHz</label>
@@ -59,8 +60,17 @@
   <div id="map"></div>
 
   <script>
-    var map = L.map('map').setView([46.8, 8.2], 8);
+    // Initialisation de la carte
+    var map = L.map('map', {
+      zoomControl: false // Désactive le contrôle de zoom par défaut
+    }).setView([46.8, 8.2], 8);
 
+    // Ajout du contrôle de zoom dans le coin inférieur gauche
+    L.control.zoom({
+      position: 'bottomleft'
+    }).addTo(map);
+
+    // Ajout des tuiles de la carte
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
@@ -171,8 +181,8 @@
                     });
 
                     var popupContent =
-                      `<b>Fréquence précise :</b> ${freqStr}<br>` +
-                      `<b>Puissance :</b> ${powerStr !== "N/A" ? powerStr + " W" : powerStr}<br>` +
+                      `<b>Fréquence :</b> ${freq} MHz<br>` +
+                      `<b>Puissance :</b> ${powerStr}<br>` +
                       `<b>Azimut :</b> ${azimut}°`;
                     sector.bindPopup(popupContent);
 
