@@ -1,0 +1,339 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html>
+<head>
+  <title>Carte antennes sans clusters</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #controls {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: white;
+      padding: 5px;
+      z-index: 1000;
+      border-radius: 4px;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: auto;
+      min-width: 160px;
+    }
+    #operator-group, #tech-group, #freq-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    #operator-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    #operator-group > div:first-child {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+    }
+    .filter-button {
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      padding: 3px 6px;
+      cursor: pointer;
+      font-size: 10px;
+      transition: background 0.2s;
+    }
+    .filter-button.active {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+    .filter-button:hover {
+      background: #e0e0e0;
+    }
+    .filter-button.active:hover {
+      background: #0056b3;
+    }
+    #last-update {
+      font-size: 9px;
+      color: gray;
+      white-space: nowrap;
+    }
+    @media (max-width: 600px) {
+      #controls {
+        top: 3px;
+        right: 3px;
+        padding: 4px;
+        min-width: 140px;
+      }
+      .filter-button {
+        padding: 2px 5px;
+        font-size: 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="controls">
+    <div id="operator-group">
+      <div><strong>Operator</strong><div id="last-update">Last update May 2025</div></div>
+      <div class="button-group">
+        <button class="filter-button active" data-type="operator" data-value="Sunrise">Sunrise</button>
+        <button class="filter-button" data-type="operator" data-value="Salt">Salt</button>
+        <button class="filter-button" data-type="operator" data-value="Swisscom">Swisscom</button>
+      </div>
+    </div>
+    <div id="tech-group">
+      <strong>Technology</strong>
+      <div class="button-group">
+        <button class="filter-button" data-type="tech" data-value="3G">3G</button>
+        <button class="filter-button" data-type="tech" data-value="4G">4G</button>
+        <button class="filter-button active" data-type="tech" data-value="5G">5G</button>
+      </div>
+    </div>
+    <div id="freq-group">
+      <strong>Frequency</strong>
+      <div class="button-group">
+        <button class="filter-button active" data-type="freq" data-value="freq1">750 MHz</button>
+        <button class="filter-button" data-type="freq" data-value="freq2">950 MHz</button>
+        <button class="filter-button" data-type="freq" data-value="freq3">2100 MHz</button>
+        <button class="filter-button" data-type="freq" data-value="freq4">3500 MHz</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <script>
+    var map = L.map('map', {
+      zoomControl: false
+    }).setView([46.8, 8.2], 8);
+
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const geojsonURLs = {
+      Sunrise: {
+        "3G": 'https://raw.githubusercontent.com/AntenneCarte/1/main/Sunrise_3G.geojson',
+        "4G": 'https://raw.githubusercontent.com/AntenneCarte/1/main/Sunrise_4G.geojson',
+        "5G": 'https://raw.githubusercontent.com/AntenneCarte/1/main/Sunrise_5G.geojson'
+      },
+      Salt: {
+        "3G": 'https://raw.githubusercontent.com/AntenneCarte/1/main/Salt_3G.geojson',
+        "4G": 'https://raw.githubusercontent.com/AntenneCarte/1/main/Salt_4G.geojson',
+        "5G": 'https://raw.githubusercontent.com/AntenneCarte/1/main/Salt_5G.geojson'
+      },
+      Swisscom: {
+        "3G": 'https://raw.githubusercontent.com/AntenneCarte/1/main/Swisscom_3G.geojson',
+        "4G": 'https://raw.githubusercontent.com/AntenneCarte/1/main/Swisscom_4G.geojson',
+        "5G": 'https://raw.githubusercontent.com/AntenneCarte/1/main/Swisscom_5G.geojson'
+      }
+    };
+
+    let currentOperator = "Sunrise";
+    let currentTechnology = "5G";
+    let currentFrequency = "freq1";
+    const sectorRadius = 500 / 3;
+    const MIN_ZOOM_FOR_SECTORS = 10;
+    const MAX_DISTANCE_FOR_SECTORS = 5000;
+
+    const layers = {
+      freq1: { markers: L.layerGroup(), sectors: L.layerGroup() },
+      freq2: { markers: L.layerGroup(), sectors: L.layerGroup() },
+      freq3: { markers: L.layerGroup(), sectors: L.layerGroup() },
+      freq4: { markers: L.layerGroup(), sectors: L.layerGroup() }
+    };
+
+    function createAzimuthSector(lat, lon, azimuth, angleWidth, radius) {
+      const points = [[lat, lon]];
+      const azimuthRad = azimuth * Math.PI / 180;
+      const angleStart = azimuthRad - angleWidth * Math.PI / 180 / 2;
+      const angleEnd = azimuthRad + angleWidth * Math.PI / 180 / 2;
+
+      for (let i = 0; i <= 30; i++) {
+        const angle = angleStart + (angleEnd - angleStart) * (i / 30);
+        const dx = radius * Math.sin(angle);
+        const dy = radius * Math.cos(angle);
+        const newLat = lat + dy / 111320;
+        const newLon = lon + dx / (111320 * Math.cos(lat * Math.PI / 180));
+        points.push([newLat, newLon]);
+      }
+      return points;
+    }
+
+    function updateMap() {
+      for (const key in layers) {
+        map.removeLayer(layers[key].markers);
+        map.removeLayer(layers[key].sectors);
+        layers[key].markers.clearLayers();
+        layers[key].sectors.clearLayers();
+      }
+
+      const url = geojsonURLs[currentOperator][currentTechnology];
+      const mapCenter = map.getCenter();
+      const markerCoords = {};
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          data.features.forEach(feature => {
+            if (feature.geometry.type !== "Point") return;
+
+            const [lon, lat] = feature.geometry.coordinates;
+            const props = feature.properties;
+            const freqStr = props["frequency (MHz)"] || "0 MHz";
+            const freq = parseFloat(freqStr.replace(/[^\d.]/g, '')) || 0;
+            const azimut = parseFloat((props["Azimut"] || "0°").replace("°", "")) || 0;
+
+            let targetLayer = null;
+            if (freq < 900) targetLayer = "freq1";
+            else if (freq <= 1000) targetLayer = "freq2";
+            else if (freq <= 3000) targetLayer = "freq3";
+            else targetLayer = "freq4";
+
+            if (targetLayer === currentFrequency) {
+              const key = `${lat.toFixed(6)},${lon.toFixed(6)}`;
+              if (!markerCoords[key]) {
+                const marker = L.circleMarker([lat, lon], {
+                  radius: 5,
+                  color: 'red',
+                  fillColor: 'red',
+                  fillOpacity: 0.8
+                });
+                markerCoords[key] = marker;
+                layers[currentFrequency].markers.addLayer(marker);
+              }
+
+              if (map.getZoom() >= MIN_ZOOM_FOR_SECTORS) {
+                const distance = mapCenter.distanceTo([lat, lon]);
+                if (distance <= MAX_DISTANCE_FOR_SECTORS) {
+                  const sector = L.polygon(createAzimuthSector(lat, lon, azimut, 60, sectorRadius), {
+                    color: 'blue',
+                    fillColor: 'blue',
+                    fillOpacity: 0.3,
+                    weight: 1
+                  });
+
+                  const adaptive = props["Adaptive mode"];
+                  const adaptiveText = adaptive == "1" ? "Yes" : "No";
+
+                  const pci = props["PCI"] || "not available for this antenna";
+                  const commissioning = props["Commissioning date"] || "Unknown";
+
+                  const popup = `
+                    <b>Frequency:</b> ${freqStr}<br>
+                    <b>Power:</b> Coming soon<br>
+                    <b>Adaptive mode:</b> ${adaptiveText}<br>
+                    <b>PCI:</b> ${pci}<br>
+                    <b>Commissioning date:</b> ${commissioning}
+                  `;
+                  sector.bindPopup(popup);
+                  layers[currentFrequency].sectors.addLayer(sector);
+                }
+              }
+            }
+          });
+
+          map.addLayer(layers[currentFrequency].markers);
+          map.addLayer(layers[currentFrequency].sectors);
+        })
+        .catch(err => console.error("Erreur chargement GeoJSON:", err));
+    }
+
+    function updateButtonStyles(type, value) {
+      document.querySelectorAll(`.filter-button[data-type="${type}"]`).forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.value === value);
+      });
+    }
+
+    document.querySelectorAll('.filter-button[data-type="operator"]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        currentOperator = this.dataset.value;
+        updateButtonStyles('operator', currentOperator);
+        updateMap();
+      });
+    });
+
+    document.querySelectorAll('.filter-button[data-type="tech"]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        currentTechnology = this.dataset.value;
+        updateButtonStyles('tech', currentTechnology);
+        updateMap();
+      });
+    });
+
+    document.querySelectorAll('.filter-button[data-type="freq"]').forEach(btn => {
+      btn.addEventListener('click', function () {
+        currentFrequency = this.dataset.value;
+        updateButtonStyles('freq', currentFrequency);
+        updateMap();
+      });
+    });
+
+    map.on('zoomend moveend', updateMap);
+    updateMap();
+  </script>
+</body>
+</html>
